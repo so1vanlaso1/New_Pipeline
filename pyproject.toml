@@ -1,0 +1,50 @@
+[project]
+name = "exact2026-logic"
+version = "0.1.0"
+description = "EXACT 2026 Track 1 — Neuro-symbolic logic QA pipeline"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "z3-solver>=4.13",
+    "pydantic>=2.6",
+    "pyyaml>=6.0",
+    "typer>=0.12",
+    "rich>=13.7",
+    "numpy>=1.26",
+    "tqdm>=4.66",
+]
+
+[project.optional-dependencies]
+gpu = [
+    "torch>=2.3",
+    "transformers>=4.45",
+    "vllm>=0.6.3",
+    "peft>=0.13",
+    "trl>=0.11",
+    "datasets>=3.0",
+    "accelerate>=1.0",
+    "bitsandbytes>=0.43",
+]
+unsloth = [
+    "unsloth",
+]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "ruff>=0.6",
+]
+
+[project.scripts]
+exact-run = "cli.run:app"
+exact-train = "cli.train:app"
+exact-eval = "cli.eval:app"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

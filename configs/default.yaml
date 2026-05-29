@@ -1,0 +1,52 @@
+paths:
+  data_train: data/exact2026/train.json
+  data_dev: data/exact2026/dev.json
+  data_test: data/exact2026/test.json
+  artifacts: artifacts/
+  translator_lora: artifacts/translator-lora/
+
+models:
+  # Qwen3.5-4B (https://huggingface.co/Qwen/Qwen3.5-4B) — single workhorse;
+  # at AWQ-4bit it occupies ~2.5 GB of the 5070's 12 GB and leaves headroom
+  # for K=5 sampling KV cache at a moderate context length.
+  workhorse: Qwen/Qwen3.5-4B
+  reasoner: Qwen/Qwen3.5-4B          # same model; no separate thinking variant on 5070
+  quantization: awq                   # awq | fp8 | none. Blackwell supports FP8 too.
+  dtype: auto
+  max_model_len: 4096                 # ~half the 4090 default to keep KV cache modest on 12 GB
+
+vllm:
+  gpu_memory_utilization: 0.80        # leave ~2 GB free for Z3 + Python on the 5070
+  enforce_eager: false
+  enable_lora: true
+  max_lora_rank: 32
+
+translator:
+  k_samples: 5
+  temperature: 0.3
+  top_p: 0.9
+  max_new_tokens: 1024
+  output_format: smtlib       # smtlib | python_z3
+
+solver:
+  timeout_ms: 5000
+  emit_unsat_core: true
+
+vote:
+  high_confidence_threshold: 4   # >= votes for confidence 0.95
+  medium_confidence_threshold: 3 # >= votes for confidence 0.70
+
+fallback:
+  k_samples: 5
+  temperature: 0.7
+  top_p: 0.9
+  max_new_tokens: 2048
+  use_reasoner_variant: false  # no separate reasoner variant on 5070 (12 GB)
+
+pipeline:
+  wall_clock_budget_s: 55      # leave 5s margin under the 60s cap
+  log_per_stage: true
+
+eval:
+  split: dev
+  out_path: artifacts/eval_results.json
