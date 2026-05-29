@@ -1,0 +1,31 @@
+# EXACT 2026 — Finetune (Qwen3.5-4B + LoRA) requirements.
+#
+# RTX 5070 is Blackwell (sm_120). PyTorch needs CUDA 12.6+ wheels — pinned via
+# the cu126 extra-index in setup.sh. If you're on a 4090 or older, the same
+# requirements file works but you can use the standard cu121 wheels.
+
+# Core
+torch>=2.5
+transformers>=4.46
+accelerate>=1.1
+
+# LoRA / SFT
+peft>=0.13
+trl>=0.12
+datasets>=3.1
+
+# 4-bit base quantization for training (8-bit Adam optim also lives here)
+bitsandbytes>=0.44
+
+# Flash Attention 2 — essentially required to fit Qwen3.5-4B training on 12 GB.
+# Install separately in setup.sh because the wheel needs a CUDA-matched build.
+# flash-attn>=2.6
+
+# Project deps
+pydantic>=2.6
+typer>=0.12
+rich>=13.7
+tqdm>=4.66
+
+# Tests (optional)
+pytest>=8.0
